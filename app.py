@@ -1,7 +1,5 @@
 import os
 
-# Fix for the Protobuf error
-os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
 
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
@@ -18,14 +16,19 @@ from langserve import add_routes
 from fastapi import FastAPI
 import uvicorn
 
+# Fix for the Protobuf error
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+
 load_dotenv()
-os.environ["GOOGLE_API_KEY"] = os.getenv("GOOGLE_API_KEY")
-os.environ["GROQ_API_KEY"] = os.getenv("GROQ_API_KEY")
+# os.environ["GOOGLE_API_KEY"] = os.getenv("GOOGLE_API_KEY")
+# os.environ["GROQ_API_KEY"] = os.getenv("GROQ_API_KEY")
 os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY")
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 
 
 # print(os.getenv("LANGCHAIN_API_KEY"))
+google_key = os.getenv("GOOGLE_API_KEY")
+groq_key = os.getenv("GROQ_API_KEY")
 
 
 def load_chain():
@@ -38,7 +41,9 @@ def load_chain():
     ).split_documents(docs)
 
     # embeddings
-    embeddings = GoogleGenerativeAIEmbeddings(model_name="models/embedding-001")
+    embeddings = GoogleGenerativeAIEmbeddings(
+        model="models/embedding-001", google_api_key=google_key
+    )
 
     # vector db
     db = Chroma.from_documents(chunks, embeddings)
@@ -53,7 +58,7 @@ def load_chain():
     Question : {Question}
     """)
     # llm
-    llm = ChatGroq(model="llama-3.3-70b-versatile")
+    llm = ChatGroq(model="llama-3.3-70b-versatile", groq_api_key=groq_key)
 
     chain = (
         {"Context": retriever, "Question": RunnablePassthrough()}
@@ -76,4 +81,6 @@ app = FastAPI(
 add_routes(app, chain, path=("/AttentionQnA"))
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=8000)
+    # Get port from environment variable, default to 10000
+    port = int(os.environ.get("PORT", 10000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
