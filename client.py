@@ -4,9 +4,9 @@ import requests
 
 
 def get_response(query):
-    response = requests.post(
-        "http://localhost:8000/AttentionQnA/invoke", json={"input": query}
-    )
+    # Replace 'your-app-name' with the actual URL Render gives you
+    url = "https://rag-fastapi-langchain.onrender.com/AttentionQnA/invoke"
+    response = requests.post(url, json={"input": query})
     return response.json()["output"]
 
 
