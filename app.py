@@ -9,7 +9,7 @@ from langchain_core.output_parsers import StrOutputParser
 from dotenv import load_dotenv
 
 # import os
-from langchain_google_gen import GoogleGenerativeAIEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_core.runnables import RunnablePassthrough
 from langchain_chroma import Chroma
 from langchain_community.document_loaders import PyPDFLoader
