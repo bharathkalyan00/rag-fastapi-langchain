@@ -37,7 +37,7 @@ def load_chain():
 
     # chunks
     chunks = RecursiveCharacterTextSplitter(
-        chunk_size=1000, chunk_overlap=20
+        chunk_size=500, chunk_overlap=50
     ).split_documents(docs)
 
     # embeddings
@@ -46,7 +46,7 @@ def load_chain():
     )
 
     # vector db
-    db = Chroma.from_documents(chunks, embeddings)
+    db = Chroma.from_documents(chunks, embeddings, persist_directory="./chroma_db")
 
     # retriever
     retriever = db.as_retriever()
