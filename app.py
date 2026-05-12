@@ -46,7 +46,15 @@ def load_chain():
     )
 
     # vector db
-    db = Chroma.from_documents(chunks, embeddings, persist_directory="./chroma_db")
+    db = Chroma.from_documents([chunks[0]], embeddings, persist_directory="./chroma_db")
+
+    # adding chunks in batches
+    remaining_chunks = chunks[1:]
+    batch_size = 5
+    for i in range(0, len(remaining_chunks), batch_size):
+        batch = remaining_chunks[i : i + batch_size]
+        db.add_documents(batch)
+        print(f"uploaded batch {i//batch_size + 1} ")
 
     # retriever
     retriever = db.as_retriever()
